@@ -361,8 +361,10 @@
     const name = document.getElementById("t-name").value.trim();
     const n = +qty.value;
     const total = +kind.value * n;
+    const which = kind.options[kind.selectedIndex] ? kind.options[kind.selectedIndex].text : "";
+    const when = (document.getElementById("t-date").value || "").trim();
     if (!name) return bad(out, "Who should the seats be under?");
-    ok(out, `${n} ${n > 1 ? "seats" : "seat"} for ${document.getElementById("t-date").value}, `
+    ok(out, `${n} ${n > 1 ? "seats" : "seat"} of ${which}${when ? " on " + when : ""}, `
       + `under ${name}. Total ${peso(total)}. Nothing is charged in this demo.`);
   });
 
