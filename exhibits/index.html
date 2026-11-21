@@ -1,0 +1,108 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code exhibits — Gabrielle Zach Dela Cruz</title>
+<style>
+body{margin:0;background:#fff;color:#141a1f;font:16px/1.65 "Segoe UI",Calibri,Arial,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:44px 26px 70px}
+.back{font-size:14px;color:#0b6b57;text-decoration:none;font-weight:600}
+h1{font-size:30px;letter-spacing:-.6px;margin:16px 0 8px}
+.lead{color:#3d4a52;margin:0 0 26px;font-size:16.5px}
+nav{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;margin:0 0 30px;padding-bottom:16px;border-bottom:1px solid #e2e8e6}
+nav a{color:#3d4a52;text-decoration:none;font-weight:600}
+article{border-top:1px solid #e2e8e6;padding:26px 0}
+h2{font-size:21px;letter-spacing:-.3px;margin:0 0 12px}
+h3{font-size:16px;text-transform:uppercase;letter-spacing:.08em;color:#0b6b57;margin:22px 0 8px}
+h4{font-size:15.5px;margin:16px 0 6px}
+p{margin:9px 0;color:#3d4a52;font-size:15.3px}
+code{background:#f2f6f4;border-radius:3px;padding:1px 5px;font-size:13.6px;font-family:Consolas,monospace}
+pre{background:#f7faf9;border:1px solid #e2e8e6;border-radius:8px;padding:14px 16px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:13.2px;line-height:1.55}
+ul{margin:8px 0 8px 18px;padding:0;color:#3d4a52;font-size:15.3px}
+li{margin:5px 0}
+strong{color:#141a1f}
+footer{margin-top:30px;border-top:1px solid #e2e8e6;padding-top:18px;color:#6d7c85;font-size:14px}
+</style></head><body><div class="wrap">
+<a class="back" href="../index.html">← Portfolio</a>
+<h1>Code exhibits</h1>
+<p class="lead">Three sanitized walkthroughs for a technical reader. No client names, no client data, no figures that
+belong to anyone else. What is shown is the reasoning and the failure each one prevents.</p>
+<nav><a href="#01">1. Reference first</a><a href="#02">2. Driving a Java desktop app through its accessibility tree</a><a href="#03">3. Read-back verification</a></nav>
+<article id="01"><h2>Reference first: pairing credits to the right invoice</h2>
+
+<p>The rule: two documents are the same thing only if a stable reference says so. Amount is a</p>
+<p>consequence, never evidence.</p>
+
+<pre><code>
+def pair_credit_notes(open_items, credit_notes):
+    # 1. exact reference match only
+    by_ref = {i[&quot;invoice_ref&quot;]: i for i in open_items if i.get(&quot;invoice_ref&quot;)}
+    paired, orphans = [], []
+    for note in credit_notes:
+        target = by_ref.get(note[&quot;against_ref&quot;])
+        if target is None:
+            orphans.append(note)          # goes to a human, not to a guess
+            continue
+        paired.append((target, note))
+    # 2. amount is a *check*, not a matcher
+    mismatched = [(t, n) for t, n in paired
+                  if abs(t[&quot;open_amount&quot;] + n[&quot;amount&quot;]) &gt; 0.01]
+    return paired, orphans, mismatched
+</code></pre>
+
+<p>Why it matters: an amount-first match has a plausible failure mode — same amount, wrong</p>
+<p>invoice — and the resulting statement is internally consistent and wrong. Reference-first</p>
+<p>converts that silent error into an orphan row a person can see.</p>
+</article>
+<article id="02"><h2>Driving a Java desktop app through its accessibility tree</h2>
+
+<p>Shape of the bridge (Java Access Bridge, called through ctypes). One long-lived client;</p>
+<p>attach once per process, not once per action.</p>
+
+<pre><code>
+jab.initialize()                       # once
+vm_id = next(iter(jab.enumerate_jvms()))   # the running client, not a new one
+root = jab.get_accessibility_info(vm_id)
+
+def find(role, name, node=root):
+    for child in jab.children(node):            # depth-first over the AX tree
+        if jab.role(child) == role and jab.name(child) == name:
+            return child
+        hit = find(role, name, child)
+        if hit: return hit
+
+field = find(&quot;text&quot;, &quot;Reference&quot;)
+jab.set_text(field, value)
+assert jab.text(find(&quot;text&quot;, &quot;Reference&quot;)) == value   # re-read, always
+</code></pre>
+
+<p>Two rules that keep this stable: never address a component by screen position, and always</p>
+<p>re-read the field after writing it. The accessibility tree survives window moves, theme</p>
+<p>changes and a user working in the same app; coordinates do not.</p>
+</article>
+<article id="03"><h2>Read-back verification: making done mean done</h2>
+
+<p>Every artefact-producing step returns evidence, not a boolean.</p>
+
+<pre><code>
+@dataclass
+class Artefact:
+    path: str
+    sha256: str
+    rows: int
+    total: Decimal
+    read_back: dict
+
+def emit_statement(build, expected_total):
+    path = write_workbook(build)
+    back = read_workbook(path)                       # re-open, don&#x27;t trust the writer
+    a = Artefact(path, sha256(path), len(back.rows), back.total,
+                 {&quot;rows&quot;: len(back.rows), &quot;total&quot;: str(back.total)})
+    assert a.total == expected_total, f&quot;subtotal drift on {path}&quot;
+    return a
+</code></pre>
+
+<p>Two habits in ten lines: the writer is never the reader, and the total is checked against the</p>
+<p>source export rather than against the writer&#x27;s own arithmetic.</p>
+</article>
+<footer>Gabrielle Zach Dela Cruz · gabriellezachdelacruz@gmail.com · github.com/Gabizakku</footer>
+</div></body></html>

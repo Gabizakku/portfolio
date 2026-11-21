@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wildacre — farm, kiln and workshop (build demo)</title>
+<style>
+  :root{
+    --soil:#2c2419; --bark:#4a3b28; --moss:#5c6b3a; --clay:#b4643c; --wheat:#f4efe4;
+    --cream:#fbf8f1; --line:#e3dccc; --sun:#e0a33c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--soil);
+    font:16px/1.6 Georgia,'Iowan Old Style',serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--clay)}
+  .bar{background:var(--soil);color:#e9e0cd;font:12.5px/1.4 "Segoe UI",system-ui,sans-serif;
+    letter-spacing:.06em;text-align:center;padding:7px 14px}
+  .bar b{color:var(--sun)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 26px}
+  header{background:var(--wheat);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0}
+  .logo{font:600 21px/1 Georgia,serif;letter-spacing:-.2px}
+  .logo span{display:block;font:11px/1 "Segoe UI",sans-serif;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--moss);margin-top:6px}
+  .nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;
+    font:14px/1 "Segoe UI",sans-serif}
+  .nav ul a{color:var(--bark);text-decoration:none;font-weight:600}
+  .nav ul a:hover{color:var(--clay)}
+
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center;padding:44px 0 48px}
+  .hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.08;margin:0 0 16px;letter-spacing:-1px}
+  .hero p{font-size:17.5px;color:var(--bark);margin:0 0 22px;max-width:44ch}
+  .cta{display:inline-block;background:var(--clay);color:#fff;text-decoration:none;
+    font:600 15px/1 "Segoe UI",sans-serif;padding:14px 22px;border-radius:4px}
+  .cta.ghost{background:transparent;color:var(--bark);border:1px solid var(--bark);margin-left:10px}
+  .art{aspect-ratio:4/3;border-radius:6px;border:1px solid var(--line);overflow:hidden;background:#eee7d8}
+  .art svg{width:100%;height:100%;display:block}
+
+  section{padding:46px 0;border-top:1px solid var(--line)}
+  h2{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--moss);
+    font-family:"Segoe UI",sans-serif;font-weight:700;margin:0 0 8px}
+  .sub{font-size:26px;line-height:1.2;margin:0 0 26px;letter-spacing:-.4px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  .class{border:1px solid var(--line);border-radius:6px;background:#fff;padding:20px}
+  .class h3{margin:0 0 6px;font-size:18px}
+  .when{font:13px/1 "Segoe UI",sans-serif;color:var(--moss);letter-spacing:.04em;margin:0 0 12px}
+  .class p{margin:0 0 14px;font-size:14.6px;color:var(--bark)}
+  .price{font:600 14px/1 "Segoe UI",sans-serif;color:var(--clay)}
+  .btn{appearance:none;border:1px solid var(--bark);background:transparent;color:var(--bark);
+    font:600 13.5px/1 "Segoe UI",sans-serif;padding:11px 16px;border-radius:4px;cursor:pointer}
+  .btn:hover{background:var(--bark);color:#fff}
+  .btn.solid{background:var(--moss);border-color:var(--moss);color:#fff}
+  .btn.solid:hover{background:#4b5730}
+
+  .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+  .tier{border:1px solid var(--line);border-radius:6px;padding:22px;background:#fff;position:relative}
+  .tier.best{border-color:var(--moss);box-shadow:0 6px 22px rgba(92,107,58,.10)}
+  .tier .tag{position:absolute;top:-11px;left:18px;background:var(--moss);color:#fff;
+    font:700 10.5px/1 "Segoe UI",sans-serif;letter-spacing:.14em;padding:5px 9px;border-radius:3px;text-transform:uppercase}
+  .tier h3{margin:0 0 4px;font-size:19px}
+  .tier .amt{font:600 27px/1 Georgia,serif;color:var(--soil);margin:10px 0 14px}
+  .tier .amt small{font:400 13px/1 "Segoe UI",sans-serif;color:var(--bark)}
+  .tier ul{margin:0 0 18px;padding-left:18px;font-size:14.4px;color:var(--bark)}
+  .tier li{margin:5px 0}
+
+  .panel{border:1px solid var(--line);border-radius:6px;background:#fff;padding:24px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  label{display:block;font:600 12.5px/1 "Segoe UI",sans-serif;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--bark);margin:0 0 6px}
+  input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:4px;
+    font:15px/1.2 "Segoe UI",sans-serif;background:var(--cream);color:var(--soil)}
+  input:focus,select:focus{outline:2px solid rgba(92,107,58,.25);border-color:var(--moss)}
+  .field{margin:0 0 14px}
+  .hint{font:12.5px/1.4 "Segoe UI",sans-serif;color:#8b7f68;margin:6px 0 0}
+  .out{margin:16px 0 0;padding:14px 16px;border-radius:5px;font:14.5px/1.5 "Segoe UI",sans-serif;display:none}
+  .out.ok{display:block;background:#eef3e6;border:1px solid #cbdab4;color:#3d4a28}
+  .out.err{display:block;background:#fbeee8;border:1px solid #e8c6b5;color:#8a3f20}
+  .total{display:flex;justify-content:space-between;font:600 16px/1 "Segoe UI",sans-serif;
+    padding:14px 0 4px;border-top:1px dashed var(--line);margin-top:6px}
+
+  .chat{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .bubbles{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px;
+    height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:88%;padding:10px 13px;border-radius:12px;font:14.6px/1.5 "Segoe UI",sans-serif}
+  .msg.bot{background:#f1ecdf;color:var(--soil);border-bottom-left-radius:3px}
+  .msg.me{background:var(--moss);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+  .ask{display:flex;gap:8px;margin-top:10px}
+  .ask input{flex:1}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 13px;
+    font:13px/1 "Segoe UI",sans-serif;color:var(--bark);cursor:pointer}
+  .chip:hover{border-color:var(--moss);color:var(--moss)}
+
+  footer{background:var(--soil);color:#ddd3bf;padding:34px 0;font:14px/1.6 "Segoe UI",sans-serif}
+  footer a{color:var(--sun)}
+  @media(max-width:760px){.hero,.chat{grid-template-columns:1fr}.row2{grid-template-columns:1fr}
+    .nav ul{display:none}}
+</style>
+</head>
+<body>
+
+<div class="bar">Build demo by <b>Gabrielle Zach Dela Cruz</b> · front end only, no live payments, no real bookings</div>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">Wildacre<span>farm · kiln · workshop</span></div>
+    <ul>
+      <li><a href="#classes">Classes</a></li>
+      <li><a href="#member">Membership</a></li>
+      <li><a href="#tickets">Tickets</a></li>
+      <li><a href="#ask">Ask</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Eight acres, one kiln, and a standing invitation.</h1>
+      <p>Seasonal vegetables, hand-thrown stoneware and weekend workshops. Members pick first and
+        come early; everyone else is welcome to the market on Saturdays.</p>
+      <a class="cta" href="#tickets">Book the harvest table</a>
+      <a class="cta ghost" href="#member">Become a member</a>
+    </div>
+    <div class="art">
+      <svg viewBox="0 0 400 300" role="img" aria-label="Illustration of farm rows and a kiln">
+        <rect width="400" height="300" fill="#e9e2ce"/>
+        <circle cx="318" cy="66" r="34" fill="#e0a33c" opacity=".85"/>
+        <path d="M0 190q70-26 140 0t140 0 120 0v110H0z" fill="#8e9b5e"/>
+        <path d="M0 214q80-20 150 0t150 0 100 0v86H0z" fill="#71804a"/>
+        <g fill="#4a3b28">
+          <rect x="52" y="150" width="7" height="60" rx="2"/>
+          <rect x="86" y="158" width="7" height="52" rx="2"/>
+          <rect x="120" y="150" width="7" height="60" rx="2"/>
+          <rect x="154" y="160" width="7" height="50" rx="2"/>
+        </g>
+        <path d="M232 152c0-26 22-40 44-40s44 14 44 40v78H232z" fill="#b4643c"/>
+        <path d="M276 96c8-10 4-22-2-30" stroke="#8a4a2b" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <rect x="246" y="176" width="18" height="24" rx="3" fill="#7d4426"/>
+        <rect x="292" y="176" width="18" height="24" rx="3" fill="#7d4426"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section id="classes">
+    <h2>Workshops</h2>
+    <p class="sub">Small groups, taught by the people who grow and make here.</p>
+    <div class="grid">
+      <article class="class">
+        <h3>Wheel throwing, first pot</h3>
+        <p class="when">Saturdays · 9:00 to 11:30 · 6 places</p>
+        <p>Clay, wheel, apron and firing included. You leave with one glazed pot, collected two weeks later.</p>
+        <p class="price">₱1,800 per person</p>
+        <button class="btn" data-class="Wheel throwing, first pot" data-price="1800">Save a place</button>
+      </article>
+      <article class="class">
+        <h3>No-dig bed building</h3>
+        <p class="when">Sundays · 7:00 to 10:00 · 10 places</p>
+        <p>Build a bed start to finish, compost recipe included. Bring gloves, we bring everything else and breakfast.</p>
+        <p class="price">₱950 per person</p>
+        <button class="btn" data-class="No-dig bed building" data-price="950">Save a place</button>
+      </article>
+      <article class="class">
+        <h3>Sourdough from the mill</h3>
+        <p class="when">Thursdays · 6:00 to 9:00 · 8 places</p>
+        <p>Milled flour, two starters, and a loaf you take home warm. Starter care sheet goes out by email.</p>
+        <p class="price">₱1,200 per person</p>
+        <button class="btn" data-class="Sourdough from the mill" data-price="1200">Save a place</button>
+      </article>
+    </div>
+    <div class="panel" style="margin-top:20px">
+      <div id="signup-box" style="display:none">
+        <div class="row2">
+          <div class="field"><label for="s-name">Name</label><input id="s-name" placeholder="Who is coming"></div>
+          <div class="field"><label for="s-email">Email</label><input id="s-email" type="email" placeholder="you@example.com"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="s-class">Workshop</label><input id="s-class" readonly></div>
+          <div class="field"><label for="s-seats">Places</label>
+            <select id="s-seats"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+          </div>
+        </div>
+        <button class="btn solid" id="s-send">Confirm booking</button>
+        <p class="hint">A demo: nothing is charged and no email is sent. The validation and the confirmation message are the point.</p>
+      </div>
+      <p id="signup-hint" style="margin:0;color:#8b7f68;font:14.5px/1.5 'Segoe UI',sans-serif">Pick a workshop above to open the booking form.</p>
+      <div class="out" id="signup-out"></div>
+    </div>
+  </section>
+
+  <section id="member">
+    <h2>Membership</h2>
+    <p class="sub">Pay by the season, pick up at the gate, skip the queue.</p>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Gate</h3>
+        <div class="amt">₱850 <small>per month</small></div>
+        <ul><li>Weekly vegetable share</li><li>Member price on workshops</li><li>Skip the market queue</li></ul>
+        <button class="btn join" data-tier="Gate" data-amount="850">Join Gate</button>
+      </div>
+      <div class="tier best">
+        <span class="tag">Most chosen</span>
+        <h3>Kiln</h3>
+        <div class="amt">₱1,400 <small>per month</small></div>
+        <ul><li>Everything in Gate</li><li>Monthly kiln access, 4 hours</li><li>Two workshop seats a season</li><li>First pick of the harvest table</li></ul>
+        <button class="btn solid join" data-tier="Kiln" data-amount="1400">Join Kiln</button>
+      </div>
+      <div class="tier">
+        <h3>Table</h3>
+        <div class="amt">₱3,200 <small>per month</small></div>
+        <ul><li>Everything in Kiln</li><li>Seat at the monthly harvest table</li><li>Bring a guest, every season</li></ul>
+        <button class="btn join" data-tier="Table" data-amount="3200">Join Table</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:20px">
+      <div class="row2">
+        <div class="field"><label for="m-name">Name</label><input id="m-name" placeholder="Your name"></div>
+        <div class="field"><label for="m-email">Email</label><input id="m-email" type="email" placeholder="you@example.com"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="m-tier">Tier</label><input id="m-tier" readonly placeholder="Pick a tier"></div>
+        <div class="field"><label for="m-start">Start</label>
+          <select id="m-start"><option>Next week</option><option>Next month</option><option>After the harvest</option></select>
+        </div>
+      </div>
+      <button class="btn solid" id="m-send">Start membership</button>
+      <p class="hint">Demo only. A real build would attach a payment page here and a welcome sequence behind it.</p>
+      <div class="out" id="member-out"></div>
+    </div>
+  </section>
+
+  <section id="tickets">
+    <h2>Harvest table</h2>
+    <p class="sub">One long table in the field, the last Saturday of the month.</p>
+    <div class="panel">
+      <div class="row2">
+        <div class="field">
+          <label for="t-kind">Ticket</label>
+          <select id="t-kind">
+            <option value="2200">Harvest table, adult · ₱2,200</option>
+            <option value="1100">Harvest table, child · ₱1,100</option>
+            <option value="1850">Harvest table, member · ₱1,850</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="t-qty">How many</label>
+          <select id="t-qty"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="t-name">Name</label><input id="t-name" placeholder="Name on the booking"></div>
+        <div class="field"><label for="t-date">Date</label>
+          <select id="t-date"><option>Sat 28 Nov</option><option>Sat 26 Dec</option><option>Sat 30 Jan</option></select>
+        </div>
+      </div>
+      <div class="total"><span>Total</span><span id="t-total">₱2,200</span></div>
+      <button class="btn solid" id="t-send" style="margin-top:14px">Hold these seats</button>
+      <p class="hint">Demo only. No payment is taken, no seats are held.</p>
+      <div class="out" id="ticket-out"></div>
+    </div>
+  </section>
+
+  <section id="ask">
+    <h2>Ask the co-op</h2>
+    <p class="sub">An assistant that answers only from what this site actually says.</p>
+    <div class="chat">
+      <div>
+        <div class="bubbles" id="bubbles">
+          <div class="msg bot">Hello. Ask me about workshops, membership, the harvest table or how to get here.</div>
+        </div>
+        <div class="ask">
+          <input id="ask-in" placeholder="Do you have pottery classes?">
+          <button class="btn solid" id="ask-send">Ask</button>
+        </div>
+        <div class="chips">
+          <button class="chip">What does membership cost?</button>
+          <button class="chip">When is the harvest table?</button>
+          <button class="chip">Can I bring a child?</button>
+          <button class="chip">Do you ship?</button>
+        </div>
+      </div>
+      <div>
+        <p style="margin:0 0 12px;color:var(--bark);font-size:15.4px">No model call and no guessing. The answers below are matched against a fixed set of facts the site owner controls, so the assistant cannot invent a price or promise a date that does not exist.</p>
+        <p style="margin:0;color:#8b7f68;font:13.6px/1.6 'Segoe UI',sans-serif">A production version would swap this for a retrieval step over the owner's own pages, with the same rule: if the answer is not in the source, say so and hand over to a person.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <strong>Wildacre is a demo.</strong> Built by Gabrielle Zach Dela Cruz as a work sample:
+    signups, tiers, ticket maths and a grounded assistant, all in one page with no framework and no backend.
+    <br><a href="index.html">Back to the portfolio</a> · gabriellezachdelacruz@gmail.com
+  </div>
+</footer>
+
+<script>
+(function(){
+  const peso = n => "₱" + n.toLocaleString("en-PH");
+  const ok = (el, text) => { el.className = "out ok"; el.textContent = text; };
+  const bad = (el, text) => { el.className = "out err"; el.textContent = text; };
+  const mailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  // workshop booking
+  let chosen = null;
+  document.querySelectorAll(".btn[data-class]").forEach(b => {
+    b.addEventListener("click", () => {
+      chosen = { name: b.dataset.class, price: +b.dataset.price };
+      document.getElementById("signup-box").style.display = "block";
+      document.getElementById("signup-hint").style.display = "none";
+      document.getElementById("s-class").value = chosen.name;
+      document.getElementById("signup-out").className = "out";
+      document.getElementById("s-name").focus();
+    });
+  });
+  document.getElementById("s-send").addEventListener("click", () => {
+    const out = document.getElementById("signup-out");
+    const name = document.getElementById("s-name").value.trim();
+    const email = document.getElementById("s-email").value.trim();
+    const seats = +document.getElementById("s-seats").value;
+    if (!name) return bad(out, "A booking needs a name.");
+    if (!mailRe.test(email)) return bad(out, "That email address does not look complete.");
+    const total = chosen.price * seats;
+    ok(out, `${name}, ${seats} ${seats > 1 ? "places" : "place"} held for ${chosen.name}. Total ${peso(total)}. `
+      + `A confirmation would go to ${email}, and the studio would see the booking against the class list.`);
+  });
+
+  // membership
+  document.querySelectorAll(".join").forEach(b => {
+    b.addEventListener("click", () => {
+      document.getElementById("m-tier").value = b.dataset.tier + " · " + peso(+b.dataset.amount) + " per month";
+      document.getElementById("member-out").className = "out";
+      document.getElementById("m-name").focus();
+    });
+  });
+  document.getElementById("m-send").addEventListener("click", () => {
+    const out = document.getElementById("member-out");
+    const name = document.getElementById("m-name").value.trim();
+    const email = document.getElementById("m-email").value.trim();
+    const tier = document.getElementById("m-tier").value;
+    if (!tier) return bad(out, "Pick a tier first, Gate, Kiln or Table.");
+    if (!name) return bad(out, "A membership needs a name.");
+    if (!mailRe.test(email)) return bad(out, "That email address does not look complete.");
+    ok(out, `${name} joins ${tier}, starting ${document.getElementById("m-start").value.toLowerCase()}. `
+      + `The next step in a real build is the payment page, then the welcome email to ${email}.`);
+  });
+
+  // tickets
+  const kind = document.getElementById("t-kind");
+  const qty = document.getElementById("t-qty");
+  const totalEl = document.getElementById("t-total");
+  const recalc = () => { totalEl.textContent = peso(+kind.value * +qty.value); };
+  kind.addEventListener("change", recalc);
+  qty.addEventListener("change", recalc);
+  document.getElementById("t-send").addEventListener("click", () => {
+    const out = document.getElementById("ticket-out");
+    const name = document.getElementById("t-name").value.trim();
+    const n = +qty.value;
+    const total = +kind.value * n;
+    if (!name) return bad(out, "Who should the seats be under?");
+    ok(out, `${n} ${n > 1 ? "seats" : "seat"} for ${document.getElementById("t-date").value}, `
+      + `under ${name}. Total ${peso(total)}. Nothing is charged in this demo.`);
+  });
+
+  // grounded assistant
+  const facts = [
+    { k: ["pottery", "wheel", "pot", "clay", "class", "workshop", "classes"],
+      a: "Three workshops run: wheel throwing on Saturdays, 9:00 to 11:30, ₱1,800 with clay and firing included. No-dig bed building on Sundays, 7:00 to 10:00, ₱950. Sourdough on Thursdays, 6:00 to 9:00, ₱1,200." },
+    { k: ["cost", "membership", "member", "price", "how much"],
+      a: "Membership is by the month. Gate is ₱850 with a weekly vegetable share and member pricing. Kiln is ₱1,400 and adds monthly kiln hours and two workshop seats a season. Table is ₱3,200 and adds the monthly harvest table seat." },
+    { k: ["harvest", "dinner", "table", "when", "date"],
+      a: "The harvest table is one long table in the field on the last Saturday of the month: 28 November, 26 December, 30 January. Adults ₱2,200, children ₱1,100, members ₱1,850." },
+    { k: ["child", "kid", "children", "family"],
+      a: "Children are welcome at the harvest table at ₱1,100, and on the no-dig bed day. Wheel throwing is fourteen and up, because of the kiln." },
+    { k: ["ship", "delivery", "deliver", "courier"],
+      a: "No shipping. Everything is collected at the gate or eaten here. That is the whole point of a share." },
+    { k: ["where", "address", "find", "get there", "direction"],
+      a: "The farm is off the Marilaque road, twenty minutes past Antipolo. Members get the gate code with the welcome email, everyone else follows the market signs on Saturday." },
+    { k: ["pay", "payment", "card", "gcash"],
+      a: "In a live build this is where payment would sit: card and GCash for tickets and the first month, then a saved method for renewals. In this demo nothing is charged." }
+  ];
+  const bubbles = document.getElementById("bubbles");
+  const input = document.getElementById("ask-in");
+  function push(text, who) {
+    const d = document.createElement("div");
+    d.className = "msg " + who;
+    d.textContent = text;
+    bubbles.appendChild(d);
+    bubbles.scrollTop = bubbles.scrollHeight;
+    return d;
+  }
+  function reply(q) {
+    const s = q.toLowerCase();
+    const hit = facts.find(f => f.k.some(k => s.includes(k)));
+    return hit ? hit.a
+      : "I do not have that on the site, so I will not guess. Leave your email and the co-op will answer directly.";
+  }
+  function ask(q) {
+    if (!q.trim()) return;
+    push(q, "me");
+    input.value = "";
+    const thought = push("…", "bot");
+    setTimeout(() => { thought.textContent = reply(q); }, 420);
+  }
+  document.getElementById("ask-send").addEventListener("click", () => ask(input.value));
+  input.addEventListener("keydown", e => { if (e.key === "Enter") ask(input.value); });
+  document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => ask(c.textContent)));
+})();
+</script>
+</body>
+</html>
